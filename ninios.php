@@ -21,37 +21,39 @@
             </thead>
             <tbody>
 <?php
+
 require_once 'conexion.php';
 
 class Ninios extends Conexion {
     public function getNinios() {
-        $query = "SELECT * FROM ninios ORDER BY nombre ASC";
-        $result = mysqli_query($this->conexion, $query);
+        $consulta = "SELECT * FROM ninios ORDER BY nombre ASC";
+        $resultado = mysqli_query($this->conexion, $consulta);
 
-        if (!$result) {
+        if (!$resultado) {
             echo "Error al obtener los datos: " . mysqli_error($this->conexion);
             return [];
         }
 
-        while ($row = mysqli_fetch_assoc($result)) {
+        while ($fila = mysqli_fetch_assoc($resultado)) {
             echo '<tr>';
-            echo "<td>{$row['idNinio']}</td>";
-            echo "<td>{$row['nombre']}</td>";
-            echo "<td>{$row['apellidos']}</td>";
-            echo "<td>{$row['fechaNacimiento']}</td>";
-            echo "<td>{$row['buenoMalo']}</td>";
-            echo "<td><a class='btn btn-outline-primary btn-sm' href='editar.php?id={$row['idNinio']}'>Editar</a> <a class='btn btn-outline-danger btn-sm' href='eliminar.php?id={$row['idNinio']}'>Eliminar</a></td>";
+            echo "<td>{$fila['idNinio']}</td>";
+            echo "<td>{$fila['nombre']}</td>";
+            echo "<td>{$fila['apellidos']}</td>";
+            echo "<td>{$fila['fechaNacimiento']}</td>";
+            echo "<td>{$fila['buenoMalo']}</td>";
+            echo "<td><a class='btn btn-outline-primary btn-sm' href='editar.php?id={$fila['idNinio']}'>Editar</a> <a class='btn btn-outline-danger btn-sm' href='eliminar.php?id={$fila['idNinio']}'>Eliminar</a></td>";
             echo '</tr>';
         }
     }
 }
 
-$niniosObj = new Ninios();
-$niniosObj->getNinios();
+$listaNinio = new Ninios();
+$listaNinio->getNinios();
+
 ?>
             </tbody>
         </table>
-        <a class="btn btn-success" href="añadir.php">Añadir nuevo niño</a>
+        <a class="btn btn-success" href="agregar_ninio.php">Añadir nuevo niño</a>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
