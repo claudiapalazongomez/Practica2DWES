@@ -34,34 +34,46 @@ class Reyes extends Conexion {
 </select>
 </form>
 <?php
-        if ($idReySeleccionado !== null && isset($nombresReyes[$idReySeleccionado])) {
-            $consulta = "SELECT ninios.nombre AS Niño, IF(ninios.buenoMalo = 1, regalos.nombre, 'Carbón') AS Regalo, IF(ninios.buenoMalo = 1, regalos.precio, 0) AS Precio
-                         FROM regalos 
-                         INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
-                         INNER JOIN ninios ON pedidos.idNinioFK = ninios.idNinio
-                         WHERE regalos.idReyFK = $idReySeleccionado
-                         ORDER BY Regalo ASC";
+if ($idReySeleccionado !== null && isset($nombresReyes[$idReySeleccionado])) {
+    $consultaCarbón = "SELECT ninios.nombre AS Niño, 'Carbón' AS Regalo, 0 AS Precio
+                        FROM ninios 
+                        WHERE buenoMalo = 0";
 
-            $resultado = mysqli_query($conexion, $consulta);
+    $consultaRegalos = "SELECT ninios.nombre AS Niño, regalos.nombre AS Regalo, regalos.precio AS Precio
+                        FROM regalos 
+                        INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
+                        INNER JOIN ninios ON pedidos.idNinioFK = ninios.idNinio
+                        WHERE regalos.idReyFK = $idReySeleccionado AND ninios.buenoMalo = 1";
 
-            if ($resultado) {
-                echo "<h2 class='py-4'>Regalos {$nombresReyes[$idReySeleccionado]}</h2>";
+    if($idReySeleccionado == 1){
+    $resultadoCarbon = mysqli_query($conexion, $consultaCarbón);
+    }
+    $resultadoRegalos = mysqli_query($conexion, $consultaRegalos);
+
+    if ($resultadoRegalos) {
+        echo "<h2 class='py-4'>Regalos {$nombresReyes[$idReySeleccionado]}</h2>";
 ?>
-                <table class="table table-bordered">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Regalo</th>
-                        <th>Niño</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Regalo</th>
+                    <th>Niño</th>
+                </tr>
+            </thead>
+            <tbody>
 <?php
-                $totalPrecio = 0; 
-                while ($fila = mysqli_fetch_assoc($resultado)) {
-                    echo "<tr><td>{$fila['Regalo']}</td><td>{$fila['Niño']}</td></tr>";
-                    $totalPrecio += $fila['Precio']; 
-                }
-                echo "<tr><td colspan='2' class='text-bg-secondary text-center'>Precio total: {$totalPrecio} €</td></tr>";
+        $totalPrecio = 0; 
+        if($idReySeleccionado == 1){
+            while ($filaCarbon = mysqli_fetch_assoc($resultadoCarbon)) {
+                echo "<tr><td>{$filaCarbon['Regalo']}</td><td>{$filaCarbon['Niño']}</td></tr>";
+            }
+        }
+        while ($filaRegalo = mysqli_fetch_assoc($resultadoRegalos)) {
+            echo "<tr><td>{$filaRegalo['Regalo']}</td><td>{$filaRegalo['Niño']}</td></tr>";
+            $totalPrecio += $filaRegalo['Precio']; 
+        }
+
+        echo "<tr><td colspan='2' class='text-bg-secondary text-center'>Precio total: {$totalPrecio} €</td></tr>";
 ?>
                 </tbody>
                 </table>
