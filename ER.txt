@@ -1,3 +1,4 @@
 NINIOS(#idNinio, nombre, apellidos, fechaNacimiento, buenoMalo)
 REYESMAGOS(#idReyMago, nombre)
-JUGUETES(#idJuguete, nombre, precio, idNinioFK, idReyMagoFK)
+JUGUETES(#idJuguete, nombre, precio, idReyMagoFK)
+PEDIR(#idPedido, idNinioFK, idJugueteFK)

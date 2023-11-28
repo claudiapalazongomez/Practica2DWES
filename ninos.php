@@ -15,7 +15,7 @@
                     <th>Nombre</th>
                     <th>Apellidos</th>
                     <th>Fecha de Nacimiento</th>
-                    <th>Bueno/Malo</th>
+                    <th>Bueno (sí/no)</th>
                     <th></th>
                 </tr>
             </thead>
@@ -39,9 +39,12 @@ class Ninios extends Conexion {
             echo "<td>{$fila['idNinio']}</td>";
             echo "<td>{$fila['nombre']}</td>";
             echo "<td>{$fila['apellidos']}</td>";
-            echo "<td>{$fila['fechaNacimiento']}</td>";
-            echo "<td>{$fila['buenoMalo']}</td>";
-            echo "<td><a class='btn btn-outline-primary btn-sm' href='editar.php?id={$fila['idNinio']}'>Editar</a> <a class='btn btn-outline-danger btn-sm' href='eliminar.php?id={$fila['idNinio']}'>Eliminar</a></td>";
+            $fechaNacimiento = $fila['fechaNacimiento'];
+            $fechaFormateada = date('d/m/Y', strtotime($fechaNacimiento));
+            echo "<td>{$fechaFormateada}</td>";
+            $buenoMalo = ($fila['buenoMalo'] == 1) ? 'Sí' : 'No';
+            echo "<td>{$buenoMalo}</td>";
+            echo "<td><a class='btn btn-outline-primary btn-sm' href='editar_ninio.php?id={$fila['idNinio']}'>Editar</a> <a class='btn btn-outline-danger btn-sm' href='eliminar_ninio.php?id={$fila['idNinio']}'>Eliminar</a></td>";
             echo '</tr>';
         }
     }

@@ -4,7 +4,7 @@ class Conexion {
     private $usuario = "studium";
     private $password = "studium__";
     private $bd = "studium_dws_p2";
-    protected $conexion;
+    public $conexion;
 
     public function __construct() {
         $this->conexion = mysqli_connect($this->servidor, $this->usuario, $this->password, $this->bd);

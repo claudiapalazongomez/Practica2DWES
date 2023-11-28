@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nuevoNinio->agregarNinio($nombre, $apellidos, $fechaNacimiento, $buenoMalo);
 }
 ?>
-        <a class="btn btn-dark mt-3" href="ninios.php">Volver a Niños</a>
+        <a class="btn btn-dark mt-3" href="ninos.php">Volver a Niños</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
