@@ -132,8 +132,64 @@ class BusquedaRegalos extends Conexion {
                     echo "<p>Error al verificar el regalo.</p>";
                 }
             }
-            } else {
-                echo "<p>No se encontraron regalos para este niño.</p>";
+            } else { 
+?>        
+            <h2 class='py-4'>Regalos de <?php echo $nombreNinioElegido ?></h2>
+            <p>No se encontraron regalos para este niño.</p>
+
+            <h2 class='py-4'>Agregar regalo a <?php echo $nombreNinioElegido?></h2>
+            <form method='post'>
+                <input type='hidden' name='idNinio' value=<?php echo $idNinioSeleccionado; ?>>
+                <label for='idRegalo'>Seleccionar Regalo:</label>
+                <select name='idRegalo' id='idRegalo'>
+                <option value=''>Seleccionar Regalo</option>
+<?php          
+                // Consulta para obtener regalos disponibles
+                $regalosExistentes = "SELECT idRegalo, nombre FROM regalos";
+                $resultadoRegaloExistente = mysqli_query($this->conexion, $regalosExistentes);
+            
+                while ($filaRegalo = mysqli_fetch_assoc($resultadoRegaloExistente)) {
+                    $idRegalo = $filaRegalo['idRegalo'];
+                    $nombreRegalo = $filaRegalo['nombre'];
+                    echo "<option value='$idRegalo'>$nombreRegalo</option>";
+                }
+?>           
+                </select>
+                <br>
+                <button type='submit' class='btn btn-success'>Agregar Regalo</button>
+            </form>
+<?php
+                if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['idNinio'], $_POST['idRegalo'])) {
+                    $idNinio = $_POST['idNinio'];
+                    $idRegalo = $_POST['idRegalo'];
+        
+                    // Verificar si el regalo NO ha sido ya seleccionado
+                    $verificarRegalo = "SELECT COUNT(*) AS contador 
+                                        FROM pedidos 
+                                        WHERE idNinioFK = $idNinio AND idRegaloFK = $idRegalo";
+                    $resultadoVerificar = mysqli_query($this->conexion, $verificarRegalo);
+        
+                    if ($resultadoVerificar) {
+                        $filaVerificada = mysqli_fetch_assoc($resultadoVerificar);
+                        $contadorRegalo = $filaVerificada['contador'];
+        
+                        if ($contadorRegalo > 0) {
+                            echo "<p>Este regalo ya fue asignado al niño.</p>";
+                        } else {
+                            // Agregar el regalo al niño
+                            $consultaAgregar = "INSERT INTO pedidos (idNinioFK, idRegaloFK) VALUES ($idNinio, $idRegalo)";
+                            $resultadoAgregar = mysqli_query($this->conexion, $consultaAgregar);
+        
+                            if ($resultadoAgregar) {
+                                echo "<p>Regalo agregado exitosamente al niño.</p>";
+                            } else {
+                                echo "<p>Error al agregar el regalo al niño.</p>";
+                            }
+                        }
+                    } else {
+                        echo "<p>Error al verificar el regalo.</p>";
+                    }
+                }
             }
         }
         } else {
