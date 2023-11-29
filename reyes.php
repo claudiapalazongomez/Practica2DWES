@@ -20,10 +20,10 @@ class Reyes extends Conexion {
             3 => 'Baltasar'
         );
 ?>
-<form method='get' class="text-center">
-    <label for='idRey'>Elige la consulta:</label>
-    <select name='idRey' id='idRey' onchange='this.form.submit()'>
-    <option value=''>Seleccionar Rey Mago</option>
+        <form method='get' class="text-center">
+            <label for='idRey'>Elige la consulta:</label>
+            <select name='idRey' id='idRey' onchange='this.form.submit()'>
+            <option value=''>Seleccionar Rey Mago</option>
 <?php
         // Recorremos cada elemento del array
         foreach ($nombresReyes as $id => $nombre) {
@@ -31,27 +31,27 @@ class Reyes extends Conexion {
             echo "<option value='$id' $selected>$nombre</option>";
         }
 ?>
-</select>
-</form>
+            </select>
+        </form>
 <?php
-if ($idReySeleccionado !== null && isset($nombresReyes[$idReySeleccionado])) {
-    $consultaCarbón = "SELECT ninios.nombre AS Niño, 'Carbón' AS Regalo, 0 AS Precio
-                        FROM ninios 
-                        WHERE buenoMalo = 0";
+        if ($idReySeleccionado !== null && isset($nombresReyes[$idReySeleccionado])) {
+            $consultaCarbón = "SELECT ninios.nombre AS Niño, 'Carbón' AS Regalo, 0 AS Precio
+                               FROM ninios 
+                               WHERE buenoMalo = 0";
 
-    $consultaRegalos = "SELECT ninios.nombre AS Niño, regalos.nombre AS Regalo, regalos.precio AS Precio
-                        FROM regalos 
-                        INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
-                        INNER JOIN ninios ON pedidos.idNinioFK = ninios.idNinio
-                        WHERE regalos.idReyFK = $idReySeleccionado AND ninios.buenoMalo = 1";
+            $consultaRegalos = "SELECT ninios.nombre AS Niño, regalos.nombre AS Regalo, regalos.precio AS Precio
+                                FROM regalos 
+                                INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
+                                INNER JOIN ninios ON pedidos.idNinioFK = ninios.idNinio
+                                WHERE regalos.idReyFK = $idReySeleccionado AND ninios.buenoMalo = 1";
 
-    if($idReySeleccionado == 1){
-    $resultadoCarbon = mysqli_query($conexion, $consultaCarbón);
-    }
-    $resultadoRegalos = mysqli_query($conexion, $consultaRegalos);
+            if($idReySeleccionado == 1){
+                $resultadoCarbon = mysqli_query($conexion, $consultaCarbón);
+            }
+            $resultadoRegalos = mysqli_query($conexion, $consultaRegalos);
 
-    if ($resultadoRegalos) {
-        echo "<h2 class='py-4'>Regalos {$nombresReyes[$idReySeleccionado]}</h2>";
+            if ($resultadoRegalos) {
+                echo "<h2 class='py-4'>Regalos {$nombresReyes[$idReySeleccionado]}</h2>";
 ?>
         <table class="table table-bordered">
             <thead class="thead-light">
@@ -62,21 +62,22 @@ if ($idReySeleccionado !== null && isset($nombresReyes[$idReySeleccionado])) {
             </thead>
             <tbody>
 <?php
-        $totalPrecio = 0; 
-        if($idReySeleccionado == 1){
-            while ($filaCarbon = mysqli_fetch_assoc($resultadoCarbon)) {
-                echo "<tr><td>{$filaCarbon['Regalo']}</td><td>{$filaCarbon['Niño']}</td></tr>";
-            }
-        }
-        while ($filaRegalo = mysqli_fetch_assoc($resultadoRegalos)) {
-            echo "<tr><td>{$filaRegalo['Regalo']}</td><td>{$filaRegalo['Niño']}</td></tr>";
-            $totalPrecio += $filaRegalo['Precio']; 
-        }
+                $totalPrecio = 0; 
+                if($idReySeleccionado == 1){
+                    while ($filaCarbon = mysqli_fetch_assoc($resultadoCarbon)) {
+                    echo "<tr><td>{$filaCarbon['Regalo']}</td><td>{$filaCarbon['Niño']}</td></tr>";
+                }
+                }
+                
+                while ($filaRegalo = mysqli_fetch_assoc($resultadoRegalos)) {
+                    echo "<tr><td>{$filaRegalo['Regalo']}</td><td>{$filaRegalo['Niño']}</td></tr>";
+                    $totalPrecio += $filaRegalo['Precio']; 
+                }
 
-        echo "<tr><td colspan='2' class='text-bg-secondary text-center'>Precio total: {$totalPrecio} €</td></tr>";
+                echo "<tr><td colspan='2' class='text-bg-secondary text-center'>Precio total: {$totalPrecio} €</td></tr>";
 ?>
-                </tbody>
-                </table>
+            </tbody>
+            </table>
 <?php
             } 
             else {
@@ -98,10 +99,11 @@ if (isset($_GET['idRey'])) {
 } else {
     $reyes->mostrarRegalosPorRey();
 }
-?>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+?>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
 

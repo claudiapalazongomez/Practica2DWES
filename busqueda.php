@@ -15,8 +15,8 @@ class BusquedaRegalos extends Conexion {
     public function mostrarFormularioBusqueda() {
         $conexion = $this->conexion;
 
-        // Obtener nombres de los niños
-        $consulta = "SELECT idNinio, CONCAT(nombre, ' ', apellidos) AS nombre_completo FROM ninios";
+        // Obtener nombres completos de los niños
+        $consulta = "SELECT idNinio, CONCAT(nombre, ' ', apellidos) AS nombreCompleto FROM ninios";
         $resultado = mysqli_query($this->conexion, $consulta);
 
         if (!$resultado) {
@@ -24,7 +24,7 @@ class BusquedaRegalos extends Conexion {
             return [];
         }
 
-        if ($resultado->num_rows > 0) {
+        if (mysqli_affected_rows($conexion) > 0) {
 ?>
         <h2>Buscar Regalos por Niño</h2>
         <form method="get">
@@ -33,75 +33,69 @@ class BusquedaRegalos extends Conexion {
             <option value="">Seleccionar Niño</option>
 
 <?php
-while ($row_ninio = $resultado->fetch_assoc()) {
-$idNinio = $row_ninio['idNinio'];
-$nombreNinio = $row_ninio['nombre_completo'];
-echo "<option value='$idNinio'>$nombreNinio</option>";
-}
+        while ($ninio = mysqli_fetch_assoc($resultado)) {
+        $idNinio = $ninio['idNinio'];
+        $nombreCompleto = $ninio['nombreCompleto'];
+        echo "<option value='$idNinio'>$nombreCompleto</option>";
+        }
 ?>
 
             </select>
         </form>
-                    <?php
 
-                    if (isset($_GET['idNinio'])) {
-                        $idNinioSeleccionado = $_GET['idNinio'];
+<?php
+        if (isset($_GET['idNinio'])) {
+            $idNinioSeleccionado = $_GET['idNinio'];
 
-                        // Consulta para obtener los regalos del niño seleccionado
-                        $query_regalos_ninio = "SELECT regalos.nombre AS nombre_regalo
-                                                FROM regalos
-                                                INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
-                                                WHERE pedidos.idNinioFK = $idNinioSeleccionado";
+            // Consulta para obtener el nombre del niño seleccionado
+            $nombreNinio = "SELECT CONCAT(nombre, ' ', apellidos) AS nombreCompleto 
+                                   FROM ninios 
+                                   WHERE idNinio = $idNinioSeleccionado";
+            $resultadoNombreNinio = mysqli_query($this->conexion, $nombreNinio);
 
-                        $result_regalos_ninio = $conexion->query($query_regalos_ninio);
+            if ($resultadoNombreNinio && mysqli_num_rows($resultadoNombreNinio) > 0) {
+                $filaNombreNinio = mysqli_fetch_assoc($resultadoNombreNinio);
+                $nombreNinioElegido = $filaNombreNinio['nombreCompleto'];
+            }
 
-                        if ($result_regalos_ninio->num_rows > 0) {
-                            ?>
-                            <h2>Regalos del Niño Seleccionado</h2>
-                            <ul>
-                                <?php
-                                while ($row_regalo = $result_regalos_ninio->fetch_assoc()) {
-                                    $nombreRegalo = $row_regalo['nombre_regalo'];
-                                    echo "<li>$nombreRegalo</li>";
-                                }
-                                ?>
-                            </ul>
+            // Consulta para obtener los regalos del niño seleccionado
+            $regalosNinio = "SELECT regalos.nombre AS nombreRegalo
+                                    FROM regalos
+                                    INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
+                                    WHERE pedidos.idNinioFK = $idNinioSeleccionado";
 
-                            <h2>Agregar Regalo al Niño Seleccionado</h2>
-                            <form method="post" action="agregar_regalo.php">
-                                <input type="hidden" name="idNinio" value="<?php echo $idNinioSeleccionado; ?>">
-                                <!-- Desplegable para seleccionar un regalo -->
-                                <label for="idRegalo">Seleccionar Regalo:</label>
-                                <select name="idRegalo" id="idRegalo">
-                                    <!-- Obtener opciones de regalos -->
-                                    <?php
-                                    $query_todos_regalos = "SELECT idRegalo, nombre FROM regalos";
-                                    $result_todos_regalos = $conexion->query($query_todos_regalos);
+            $resultadoRegaloNinio = mysqli_query($this->conexion, $regalosNinio);                        
 
-                                    while ($row_regalo = $result_todos_regalos->fetch_assoc()) {
-                                        $idRegalo = $row_regalo['idRegalo'];
-                                        $nombreRegalo = $row_regalo['nombre'];
-                                        echo "<option value='$idRegalo'>$nombreRegalo</option>";
-                                    }
-                                    ?>
-                                </select>
-                                <button type="submit">Agregar Regalo</button>
-                            </form>
-                            <?php
-                        } else {
-                            echo "<p>No se encontraron regalos para este niño.</p>";
-                        }
-                    }
-                } else {
-                    echo "<p>No hay niños registrados.</p>";
-                }
-                $conexion->close();
+            if (mysqli_affected_rows($conexion) > 0) {
+?>
+            
+            <h2>Regalos de <?php echo $nombreNinioElegido ?></h2>
+            <ul>
+<?php
+            while ($regaloElegido = mysqli_fetch_assoc($resultadoRegaloNinio)) {
+            $nombreRegalo = $regaloElegido['nombreRegalo'];
+            echo "<li>$nombreRegalo</li>";
+            }
+?>
+            </ul>
+
+            <h2>Agregar Regalo a <?php echo $nombreNinioElegido ?></h2>
+
+<?php
+            } else {
+                echo "<p>No se encontraron regalos para este niño.</p>";
             }
         }
+        } else {
+            echo "<p>No hay niños registrados.</p>";
+        }
+        $conexion->close();
+    }
+}
 
-        $busquedaRegalos = new BusquedaRegalos();
-        $busquedaRegalos->mostrarFormularioBusqueda();
-        ?>
+    $busquedaRegalos = new BusquedaRegalos();
+    $busquedaRegalos->mostrarFormularioBusqueda();
+?>
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>

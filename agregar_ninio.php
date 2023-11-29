@@ -14,23 +14,16 @@ require_once 'conexion.php';
 class Ninios extends Conexion {
     public function agregarNinio($nombre, $apellidos, $fechaNacimiento, $buenoMalo) {
         $fechaFormateada = date('Y-m-d', strtotime($fechaNacimiento));
-        // Preparar la consulta SQL para la inserción
         $consulta = "INSERT INTO ninios (nombre, apellidos, fechaNacimiento, buenoMalo) VALUES ('$nombre', '$apellidos', '$fechaFormateada', '$buenoMalo')";
         $sentencia = mysqli_prepare($this->conexion, $consulta);
 
-        // Comprobar si la consulta está preparada correctamente
         if ($sentencia) {
-            // Ejecutar la declaración
             mysqli_stmt_execute($sentencia);
-
-            // Verificar si se realizó la inserción correctamente
             if (mysqli_stmt_affected_rows($sentencia) > 0) {
                 echo "<p>Niño añadido exitosamente.</p>";
             } else {
                 echo "<p>Error al añadir al niño.</p>";
             }
-
-            // Cerrar la declaración
             mysqli_stmt_close($sentencia);
         } else {
             echo "Error en la preparación de la consulta: " . mysqli_error($this->conexion);

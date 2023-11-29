@@ -19,37 +19,37 @@
                 </tr>
             </thead>
             <tbody>
-                <?php
-                require_once 'conexion.php';
+<?php
+require_once 'conexion.php';
 
-                class Regalos extends Conexion {
-                    public function getRegalos() {
-                        $consulta = "SELECT regalos.idRegalo, regalos.nombre, regalos.precio, reyes.nombre AS nombre_rey 
-                                    FROM regalos 
-                                    INNER JOIN reyes ON idReyFK = idRey 
-                                    ORDER BY regalos.nombre ASC;";
-                        $resultado = mysqli_query($this->conexion, $consulta);
+class Regalos extends Conexion {
+    public function getRegalos() {
+        $consulta = "SELECT regalos.idRegalo, regalos.nombre, regalos.precio, reyes.nombre AS nombre_rey 
+                     FROM regalos 
+                     INNER JOIN reyes ON idReyFK = idRey 
+                     ORDER BY regalos.nombre ASC;";
+        $resultado = mysqli_query($this->conexion, $consulta);
 
-                        if (!$resultado) {
-                            echo "Error al obtener los datos: " . mysqli_error($this->conexion);
-                            return [];
-                        }
+        if (!$resultado) {
+            echo "Error al obtener los datos: " . mysqli_error($this->conexion);
+            return [];
+        }
 
-                        while ($fila = mysqli_fetch_assoc($resultado)) {
-                            echo '<tr>';
-                            echo "<td>{$fila['idRegalo']}</td>";
-                            echo "<td>{$fila['nombre']}</td>";
-                            echo "<td>{$fila['precio']}</td>";
-                            echo "<td>{$fila['nombre_rey']}</td>";
-                            echo "<td><a class='btn btn-outline-primary btn-sm' href='editar_regalo.php?id={$fila['idRegalo']}'>Editar</a> <a class='btn btn-outline-danger btn-sm' href='eliminar_regalo.php?id={$fila['idRegalo']}'>Eliminar</a></td>";
-                            echo '</tr>';
-                        }
-                    }
-                }
+        while ($fila = mysqli_fetch_assoc($resultado)) {
+            echo '<tr>';
+            echo "<td>{$fila['idRegalo']}</td>";
+            echo "<td>{$fila['nombre']}</td>";
+            echo "<td>{$fila['precio']}</td>";
+            echo "<td>{$fila['nombre_rey']}</td>";
+            echo "<td><a class='btn btn-outline-primary btn-sm' href='editar_regalo.php?id={$fila['idRegalo']}'>Editar</a> <a class='btn btn-outline-danger btn-sm' href='eliminar_regalo.php?id={$fila['idRegalo']}'>Eliminar</a></td>";
+            echo '</tr>';
+        }
+    }
+}
 
-                $listaRegalos = new Regalos();
-                $listaRegalos->getRegalos();
-                ?>
+$listaRegalos = new Regalos();
+$listaRegalos->getRegalos();
+?>
             </tbody>
         </table>
         <a class="btn btn-success" href="agregar_regalo.php">Añadir un Regalo</a>

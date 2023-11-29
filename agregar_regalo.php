@@ -7,23 +7,23 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="pb-3 text-center">Añadir Nuevo Regalo</h1>
-        <?php
-        require_once 'conexion.php';
+        <h1 class="pb-3 text-center">Añadir Nuevo Regalo</h1>       
+<?php
+require_once 'conexion.php';
 
-        class Regalos extends Conexion {
-            public function agregarRegalo($nombre, $precio, $idReyFK) {
-                $consulta = "INSERT INTO regalos (nombre, precio, idReyFK) VALUES ('$nombre', '$precio', '$idReyFK')";
-                $resultado = mysqli_query($this->conexion, $consulta);
+class Regalos extends Conexion {
+    public function agregarRegalo($nombre, $precio, $idReyFK) {
+        $consulta = "INSERT INTO regalos (nombre, precio, idReyFK) VALUES ('$nombre', '$precio', '$idReyFK')";
+        $resultado = mysqli_query($this->conexion, $consulta);
 
-                if ($resultado) {
-                    echo "<p>Regalo añadido exitosamente.</p>";
-                } else {
-                    echo "<p>Error al añadir el regalo.</p>";
-                }
-            }
+        if ($resultado) {
+            echo "<p>Regalo añadido exitosamente.</p>";
+        } else {
+            echo "<p>Error al añadir el regalo.</p>";
         }
-        ?>
+    }
+}
+?>
         <form action="agregar_regalo.php" method="POST">
             <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre del Regalo:</label>
@@ -43,17 +43,17 @@
             </div>
             <button type="submit" class="btn btn-success">Añadir Regalo</button>
             </form>
-        <?php
-        $nuevoRegalo = new Regalos();
+<?php
+$nuevoRegalo = new Regalos();
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $nombre = $_POST['nombre'];
-            $precio = $_POST['precio'];
-            $idReyFK = $_POST['idReyFK'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nombre = $_POST['nombre'];
+    $precio = $_POST['precio'];
+    $idReyFK = $_POST['idReyFK'];
 
-            $nuevoRegalo->agregarRegalo($nombre, $precio, $idReyFK);
-        }
-        ?>
+    $nuevoRegalo->agregarRegalo($nombre, $precio, $idReyFK);
+}
+?>
         <a class="btn btn-dark mt-3" href="regalos.php">Volver a Regalos</a>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
