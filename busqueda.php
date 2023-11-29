@@ -26,7 +26,7 @@ class BusquedaRegalos extends Conexion {
 
         if (mysqli_affected_rows($conexion) > 0) {
 ?>
-        <h2>Buscar Regalos por Niño</h2>
+        <h2 class="py-4">Buscar los regalos de...</h2>
         <form method="get">
             <label for="idNinio">Seleccionar Niño:</label>
             <select name="idNinio" id="idNinio" onchange="this.form.submit()">
@@ -49,8 +49,8 @@ class BusquedaRegalos extends Conexion {
 
             // Consulta para obtener el nombre del niño seleccionado
             $nombreNinio = "SELECT CONCAT(nombre, ' ', apellidos) AS nombreCompleto 
-                                   FROM ninios 
-                                   WHERE idNinio = $idNinioSeleccionado";
+                            FROM ninios 
+                            WHERE idNinio = $idNinioSeleccionado";
             $resultadoNombreNinio = mysqli_query($this->conexion, $nombreNinio);
 
             if ($resultadoNombreNinio && mysqli_num_rows($resultadoNombreNinio) > 0) {
@@ -60,16 +60,16 @@ class BusquedaRegalos extends Conexion {
 
             // Consulta para obtener los regalos del niño seleccionado
             $regalosNinio = "SELECT regalos.nombre AS nombreRegalo
-                                    FROM regalos
-                                    INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
-                                    WHERE pedidos.idNinioFK = $idNinioSeleccionado";
+                             FROM regalos
+                             INNER JOIN pedidos ON regalos.idRegalo = pedidos.idRegaloFK
+                             WHERE pedidos.idNinioFK = $idNinioSeleccionado";
 
             $resultadoRegaloNinio = mysqli_query($this->conexion, $regalosNinio);                        
 
             if (mysqli_affected_rows($conexion) > 0) {
 ?>
             
-            <h2>Regalos de <?php echo $nombreNinioElegido ?></h2>
+            <h2 class="py-4">Regalos de <?php echo $nombreNinioElegido ?></h2>
             <ul>
 <?php
             while ($regaloElegido = mysqli_fetch_assoc($resultadoRegaloNinio)) {
@@ -79,9 +79,59 @@ class BusquedaRegalos extends Conexion {
 ?>
             </ul>
 
-            <h2>Agregar Regalo a <?php echo $nombreNinioElegido ?></h2>
-
+            <h2 class="py-4">Agregar regalo a <?php echo $nombreNinioElegido ?></h2>
+            <form method="post">
+                <input type="hidden" name="idNinio" value="<?php echo $idNinioSeleccionado; ?>">
+                <label for="idRegalo">Seleccionar Regalo:</label>
+                <select name="idRegalo" id="idRegalo">
+                <option value="">Seleccionar Regalo</option>
 <?php
+            // Consulta para obtener regalos disponibles
+            $regalosExistentes = "SELECT idRegalo, nombre FROM regalos";
+            $resultadoRegaloExistente = mysqli_query($this->conexion, $regalosExistentes);
+
+            while ($filaRegalo = mysqli_fetch_assoc($resultadoRegaloExistente)) {
+                $idRegalo = $filaRegalo['idRegalo'];
+                $nombreRegalo = $filaRegalo['nombre'];
+                echo "<option value='$idRegalo'>$nombreRegalo</option>";
+            }
+?>
+                </select>
+                <br>
+                <button type="submit" class="btn btn-success">Agregar Regalo</button>
+            </form>
+<?php
+            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['idNinio'], $_POST['idRegalo'])) {
+                $idNinio = $_POST['idNinio'];
+                $idRegalo = $_POST['idRegalo'];
+
+                // Verificar si el regalo NO ha sido ya seleccionado
+                $verificarRegalo = "SELECT COUNT(*) AS contador 
+                                    FROM pedidos 
+                                    WHERE idNinioFK = $idNinio AND idRegaloFK = $idRegalo";
+                $resultadoVerificar = mysqli_query($this->conexion, $verificarRegalo);
+
+                if ($resultadoVerificar) {
+                    $filaVerificada = mysqli_fetch_assoc($resultadoVerificar);
+                    $contadorRegalo = $filaVerificada['contador'];
+
+                    if ($contadorRegalo > 0) {
+                        echo "<p>Este regalo ya fue asignado al niño.</p>";
+                    } else {
+                        // Agregar el regalo al niño
+                        $consultaAgregar = "INSERT INTO pedidos (idNinioFK, idRegaloFK) VALUES ($idNinio, $idRegalo)";
+                        $resultadoAgregar = mysqli_query($this->conexion, $consultaAgregar);
+
+                        if ($resultadoAgregar) {
+                            echo "<p>Regalo agregado exitosamente al niño.</p>";
+                        } else {
+                            echo "<p>Error al agregar el regalo al niño.</p>";
+                        }
+                    }
+                } else {
+                    echo "<p>Error al verificar el regalo.</p>";
+                }
+            }
             } else {
                 echo "<p>No se encontraron regalos para este niño.</p>";
             }
@@ -89,7 +139,6 @@ class BusquedaRegalos extends Conexion {
         } else {
             echo "<p>No hay niños registrados.</p>";
         }
-        $conexion->close();
     }
 }
 
